@@ -23,6 +23,9 @@ db-down:
 generate:
 	sqlc generate
 
+build:
+	go build -o app main.go
+
 run: format analyzer
 	go run main.go
 

@@ -10,11 +10,20 @@ import (
 )
 
 type Querier interface {
-	CreateActivity(ctx context.Context, arg CreateActivityParams) (int64, error)
+	CreateActivity(ctx context.Context, arg CreateActivityParams) error
+	CreateGamer(ctx context.Context, arg CreateGamerParams) (int64, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (int64, error)
+	DeleteGamer(ctx context.Context, userID int64) error
+	DisableUser(ctx context.Context, arg DisableUserParams) (int64, error)
+	GetActivity(ctx context.Context, arg GetActivityParams) ([]GetActivityRow, error)
+	GetCurrentLongestRunPerDay(ctx context.Context, arg GetCurrentLongestRunPerDayParams) (LongestRunPerDay, error)
 	GetToken(ctx context.Context, id int64) (GetTokenRow, error)
+	IsActiveUser(ctx context.Context, id int64) (int64, error)
+	ListActiveUsers(ctx context.Context) ([]int64, error)
+	ListGamers(ctx context.Context) ([]Gamer, error)
+	ListLongestRunPerDay(ctx context.Context) ([]LongestRunPerDay, error)
+	UpdateLongestRunPerDay(ctx context.Context, arg UpdateLongestRunPerDayParams) (UpdateLongestRunPerDayRow, error)
 	UpdateToken(ctx context.Context, arg UpdateTokenParams) (int64, error)
-	UpdateUser(ctx context.Context, arg UpdateUserParams) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

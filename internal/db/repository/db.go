@@ -86,11 +86,15 @@ func (s *database) GetUserToken(ctx context.Context, id int64) (string, error) {
 func (s *database) CreateActivityTx(ctx context.Context, activity []sqlite.CreateActivityParams) error {
 	err := s.execTx(ctx, func(queries *sqlite.Queries) error {
 		for _, act := range activity {
-			_, err := queries.CreateActivity(ctx, act)
+			err := queries.CreateActivity(ctx, act)
 			if err != nil {
 				return err
 			}
 		}
+		//_, err := queries.UpdateLongestRunPerDay(ctx, )
+		//if err != nil {
+		//	return err
+		//}
 		return nil
 	})
 	return err

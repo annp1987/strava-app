@@ -2,16 +2,13 @@ package cronjob
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 	"strava-app/internal/config"
 	"strava-app/internal/db/repository"
 	"time"
-)
-
-const (
-	ClubID = 1116587
-	UserID = 112078641
 )
 
 type CronServer struct {
@@ -36,11 +33,22 @@ func NewCronJob(conf *config.Config, db repository.DBAPI, logger *zap.Logger) *C
 }
 
 func (s *CronServer) StartJob() error {
-	s.c.AddFunc("@every 30m", func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	s.c.AddFunc("@every 1h", func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
 		defer cancel()
-
-		s.GetActivities(ctx, 112078641)
+		userIds, err := s.db.ListActiveUsers(ctx)
+		if err != nil {
+			s.logger.Error("ListActiveUsers failed: %s", zap.Error(err))
+		}
+		for _, id := range userIds {
+			err := s.GetActivities(ctx, id)
+			if err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					return
+				}
+				s.logger.Error("GetActivities for user failed: %s", zap.Error(err))
+			}
+		}
 	})
 	s.c.Run()
 	return nil

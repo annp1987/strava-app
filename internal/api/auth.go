@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
@@ -67,10 +68,18 @@ func (s handler) Connect(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	s.logger.Info("athlete", zap.Reflect("athelete", oathResp.Athlete))
+	s.logger.Info("athlete", zap.Reflect("user", oathResp.Athlete))
 	params := sqlite.CreateUserParams{
-		ID:            int64(oathResp.Athlete.ID),
-		UserName:      oathResp.Athlete.Username,
+		ID:       int64(oathResp.Athlete.ID),
+		UserName: oathResp.Athlete.Username,
+		FirstName: sql.NullString{
+			String: oathResp.Athlete.FirstName,
+			Valid:  true,
+		},
+		LastName: sql.NullString{
+			String: oathResp.Athlete.LastName,
+			Valid:  true,
+		},
 		ProfileMedium: oathResp.Athlete.ProfileMedium,
 		Profile:       oathResp.Athlete.Profile,
 		AccessToken:   oathResp.AccessToken,
@@ -80,5 +89,8 @@ func (s handler) Connect(c *fiber.Ctx) error {
 	if _, err := s.db.CreateUser(context.Background(), params); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "create user %s", err.Error())
 	}
-	return c.Redirect(s.conf.RedirectURL, 301)
+
+	redirectUrl := fmt.Sprintf("%s?id=%d&user_name=%s&profile=%s&profile_medium=%s", s.conf.RedirectURL,
+		oathResp.Athlete.ID, oathResp.Athlete.Username, oathResp.Athlete.Profile, oathResp.Athlete.ProfileMedium)
+	return c.Redirect(redirectUrl, 301)
 }
