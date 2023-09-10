@@ -1,0 +1,16 @@
+version: 2
+sql:
+- engine: "sqlite"
+  queries: "./internal/db/repository/query"
+  schema: "./internal/db/migration/"
+  rules:
+  - sqlc/db-prepare
+  gen:
+    go:
+      package: "sqlite"
+      out: "/internal/db/repository/sqlite"
+      emit_interface: true
+      emit_json_tags: true
+      emit_prepared_queries: false
+      emit_empty_slices: true
+      emit_exact_table_names: false
