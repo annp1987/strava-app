@@ -31,7 +31,7 @@ func NewCronJob(conf *config.Config, db repository.DBAPI, logger *zap.Logger) *C
 }
 
 func (s *CronServer) StartJob() error {
-	s.c.AddFunc("@every 1h", func() {
+	s.c.AddFunc("@every 15s", func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
 		defer cancel()
 		userIds, err := s.db.ListActiveUsers(ctx)

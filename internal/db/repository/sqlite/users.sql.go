@@ -18,15 +18,15 @@ INSERT OR REPLACE INTO register_users (
 `
 
 type CreateUserParams struct {
-	ID            int64          `json:"id"`
-	UserName      string         `json:"user_name"`
-	FirstName     sql.NullString `json:"first_name"`
-	LastName      sql.NullString `json:"last_name"`
-	ProfileMedium string         `json:"profile_medium"`
-	Profile       string         `json:"profile"`
-	AccessToken   string         `json:"access_token"`
-	RefreshToken  string         `json:"refresh_token"`
-	ExpiredAt     int64          `json:"expired_at"`
+	ID            int64  `json:"id"`
+	UserName      string `json:"user_name"`
+	FirstName     string `json:"first_name"`
+	LastName      string `json:"last_name"`
+	ProfileMedium string `json:"profile_medium"`
+	Profile       string `json:"profile"`
+	AccessToken   string `json:"access_token"`
+	RefreshToken  string `json:"refresh_token"`
+	ExpiredAt     int64  `json:"expired_at"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (int64, error) {

@@ -38,7 +38,7 @@ API Sample
 
 - GetActivity
 
-   ```curl -X GET -H "Authorization: Bearer v2.local.caHTS-lKZRmqQ-s1-bkgQytELrMXGoyG3jbT077bXXo6DvDfRW8snm8ogpex6_qXZ98QQ0FRLvcq8LAPivAjlATSDG8LKdFp1-aa23bitUtqTA.bnVsbA" -H "Content-Type: application/json" http://localhost:8080/v1/activity/112078641```
+   ```curl -X GET -H "Authorization: Bearer v2.local.JTjwUoTXIZfUjYhnqP3iGCxE1GuCa7KKYou-76lun6KVfzxKPCZKcJwk7uLb8ls2vDfiUsE_BhoWfn-ntKjCze2FA8MyHCENuGrB-Hbvx6gQuA.bnVsbA" -H "Content-Type: application/json" http://localhost:8080/v1/activity/112078641```
 
 - LongestRunPerDay
 

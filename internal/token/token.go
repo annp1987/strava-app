@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const SecretSymmetricKey = "symmetric-secret-key (size = 32)"
+const SecretSymmetricKey = "parkrun2023@symmetric-secret-key"
 
 type Claims struct {
 	UserID    int64 `json:"name"`

@@ -41,7 +41,7 @@ func (s *CronServer) GetActivities(ctx context.Context, id int64) error {
 				Distance:       float64(act.Distance),
 				AverageSpeed:   float64(act.AverageSpeed),
 				MovingTime:     act.MovingTime,
-				Name:           sql.NullString{String: act.Name, Valid: true},
+				Name:           act.Name,
 				SportType:      string(act.SportType),
 				MaxSpeed:       float64(act.MaxSpeed),
 				OriginalData:   sql.NullString{},

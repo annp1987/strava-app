@@ -25,7 +25,7 @@ type CreateActivityParams struct {
 	Distance       float64        `json:"distance"`
 	AverageSpeed   float64        `json:"average_speed"`
 	MovingTime     int64          `json:"moving_time"`
-	Name           sql.NullString `json:"name"`
+	Name           string         `json:"name"`
 	SportType      string         `json:"sport_type"`
 	MaxSpeed       float64        `json:"max_speed"`
 	OriginalData   sql.NullString `json:"original_data"`
@@ -72,17 +72,17 @@ type GetActivityParams struct {
 }
 
 type GetActivityRow struct {
-	ID             int64          `json:"id"`
-	UserID         int64          `json:"user_id"`
-	CreateAt       int64          `json:"create_at"`
-	StartDate      int64          `json:"start_date"`
-	StartDateLocal int64          `json:"start_date_local"`
-	Distance       float64        `json:"distance"`
-	AverageSpeed   float64        `json:"average_speed"`
-	MovingTime     int64          `json:"moving_time"`
-	Name           sql.NullString `json:"name"`
-	SportType      string         `json:"sport_type"`
-	MaxSpeed       float64        `json:"max_speed"`
+	ID             int64   `json:"id"`
+	UserID         int64   `json:"user_id"`
+	CreateAt       int64   `json:"create_at"`
+	StartDate      int64   `json:"start_date"`
+	StartDateLocal int64   `json:"start_date_local"`
+	Distance       float64 `json:"distance"`
+	AverageSpeed   float64 `json:"average_speed"`
+	MovingTime     int64   `json:"moving_time"`
+	Name           string  `json:"name"`
+	SportType      string  `json:"sport_type"`
+	MaxSpeed       float64 `json:"max_speed"`
 }
 
 func (q *Queries) GetActivity(ctx context.Context, arg GetActivityParams) ([]GetActivityRow, error) {

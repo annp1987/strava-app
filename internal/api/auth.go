@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
@@ -71,16 +70,10 @@ func (s handler) Connect(c *fiber.Ctx) error {
 	}
 	s.logger.Info("athlete", zap.Reflect("user", oathResp.Athlete))
 	params := sqlite.CreateUserParams{
-		ID:       int64(oathResp.Athlete.ID),
-		UserName: oathResp.Athlete.Username,
-		FirstName: sql.NullString{
-			String: oathResp.Athlete.FirstName,
-			Valid:  true,
-		},
-		LastName: sql.NullString{
-			String: oathResp.Athlete.LastName,
-			Valid:  true,
-		},
+		ID:            int64(oathResp.Athlete.ID),
+		UserName:      oathResp.Athlete.Username,
+		FirstName:     oathResp.Athlete.FirstName,
+		LastName:      oathResp.Athlete.LastName,
 		ProfileMedium: oathResp.Athlete.ProfileMedium,
 		Profile:       oathResp.Athlete.Profile,
 		AccessToken:   oathResp.AccessToken,
