@@ -1,7 +1,7 @@
 -- name: CreateActivity :exec
 INSERT OR IGNORE INTO raw_activities (
-    id, user_id, create_at, start_date, distance, average_speed, moving_time, name, sport_type, max_speed, original_data
-) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    id, user_id, create_at, start_date, start_date_local, distance, average_speed, moving_time, name, sport_type, max_speed, original_data
+) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- name: GetActivity :many
 SELECT
@@ -9,6 +9,7 @@ SELECT
     user_id,
     create_at,
     start_date,
+    start_date_local,
     distance,
     average_speed,
     moving_time,

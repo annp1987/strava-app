@@ -16,6 +16,7 @@ CREATE TABLE raw_activities (
  user_id       INTEGER NOT NULL,
  create_at     INTEGER NOT NULL,
  start_date    INTEGER NOT NULL,
+ start_date_local INTEGER NOT NULL,
  distance      REAL NOT NULL,
  average_speed REAL NOT NULL,
  moving_time   INTEGER NOT NULL,
@@ -26,26 +27,19 @@ CREATE TABLE raw_activities (
  FOREIGN KEY(user_id) REFERENCES register_users(id)
 );
 
-CREATE TABLE gamers (
- user_id INTEGER PRIMARY KEY,
- start_date INTEGER NOT NULL,
- end_date INTEGER NOT NULL,
- target INTEGER NOT NULL
+CREATE TABLE challenges (
+    id INTEGER PRIMARY KEY,
+    name text NOT NULL,
+    rules text NOT NULL
 );
 
-CREATE TABLE longest_run_per_day (
-    user_id INTEGER NOT NULL,
-    today INTEGER NOT NULL,
-    activity_id INTEGER NOT NULL,
-    start_date INTEGER NOT NULL,
-    distance      REAL NOT NULL,
-    average_speed REAL NOT NULL,
-    moving_time   INTEGER NOT NULL,
-    name          text,
-    sport_type    text NOT NULL,
-    max_speed     REAL NOT NULL,
-    PRIMARY KEY (user_id, today),
-    FOREIGN KEY(activity_id) REFERENCES raw_activities(id)
+CREATE TABLE gamers (
+ challenge_id INTEGER NOT NULL,
+ user_id INTEGER NOT NULL,
+ start_date INTEGER NOT NULL,
+ end_date INTEGER NOT NULL,
+ target INTEGER NOT NULL,
+ PRIMARY KEY (challenge_id, user_id)
 );
 
 CREATE INDEX user_activities_idx ON raw_activities(user_id);

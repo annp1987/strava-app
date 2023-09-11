@@ -2,8 +2,6 @@ package cronjob
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 	"strava-app/internal/config"
@@ -43,9 +41,6 @@ func (s *CronServer) StartJob() error {
 		for _, id := range userIds {
 			err := s.GetActivities(ctx, id)
 			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return
-				}
 				s.logger.Error("GetActivities for user failed: %s", zap.Error(err))
 			}
 		}

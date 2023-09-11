@@ -7,90 +7,139 @@ package sqlite
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createGamer = `-- name: CreateGamer :one
 INSERT OR REPLACE INTO gamers (
-    user_id, start_date, end_date, target
-) VALUES ( ?, ?, ?, ?)
-    RETURNING user_id
+    challenge_id, user_id, start_date, end_date, target
+) VALUES ( ?, ?, ?, ?, ?)
+    RETURNING challenge_id, user_id, start_date, end_date, target
 `
 
 type CreateGamerParams struct {
-	UserID    int64 `json:"user_id"`
-	StartDate int64 `json:"start_date"`
-	EndDate   int64 `json:"end_date"`
-	Target    int64 `json:"target"`
+	ChallengeID int64 `json:"challenge_id"`
+	UserID      int64 `json:"user_id"`
+	StartDate   int64 `json:"start_date"`
+	EndDate     int64 `json:"end_date"`
+	Target      int64 `json:"target"`
 }
 
-func (q *Queries) CreateGamer(ctx context.Context, arg CreateGamerParams) (int64, error) {
+func (q *Queries) CreateGamer(ctx context.Context, arg CreateGamerParams) (Gamer, error) {
 	row := q.db.QueryRowContext(ctx, createGamer,
+		arg.ChallengeID,
 		arg.UserID,
 		arg.StartDate,
 		arg.EndDate,
 		arg.Target,
 	)
-	var user_id int64
-	err := row.Scan(&user_id)
-	return user_id, err
-}
-
-const deleteGamer = `-- name: DeleteGamer :exec
-DELETE FROM gamers
-WHERE user_id = ?
-`
-
-func (q *Queries) DeleteGamer(ctx context.Context, userID int64) error {
-	_, err := q.db.ExecContext(ctx, deleteGamer, userID)
-	return err
-}
-
-const getCurrentLongestRunPerDay = `-- name: GetCurrentLongestRunPerDay :one
-SELECT user_id, today, activity_id, start_date, distance, average_speed, moving_time, name, sport_type, max_speed FROM longest_run_per_day
-WHERE user_id = ? AND today = ?
-`
-
-type GetCurrentLongestRunPerDayParams struct {
-	UserID int64 `json:"user_id"`
-	Today  int64 `json:"today"`
-}
-
-func (q *Queries) GetCurrentLongestRunPerDay(ctx context.Context, arg GetCurrentLongestRunPerDayParams) (LongestRunPerDay, error) {
-	row := q.db.QueryRowContext(ctx, getCurrentLongestRunPerDay, arg.UserID, arg.Today)
-	var i LongestRunPerDay
+	var i Gamer
 	err := row.Scan(
+		&i.ChallengeID,
 		&i.UserID,
-		&i.Today,
-		&i.ActivityID,
 		&i.StartDate,
-		&i.Distance,
-		&i.AverageSpeed,
-		&i.MovingTime,
-		&i.Name,
-		&i.SportType,
-		&i.MaxSpeed,
+		&i.EndDate,
+		&i.Target,
 	)
 	return i, err
 }
 
-const listGamers = `-- name: ListGamers :many
-SELECT
-    user_id, start_date, end_date, target
-FROM gamers
+const deleteGamer = `-- name: DeleteGamer :exec
+DELETE FROM gamers
+WHERE user_id = ? and challenge_id  = ?
 `
 
-func (q *Queries) ListGamers(ctx context.Context) ([]Gamer, error) {
-	rows, err := q.db.QueryContext(ctx, listGamers)
+type DeleteGamerParams struct {
+	UserID      int64 `json:"user_id"`
+	ChallengeID int64 `json:"challenge_id"`
+}
+
+func (q *Queries) DeleteGamer(ctx context.Context, arg DeleteGamerParams) error {
+	_, err := q.db.ExecContext(ctx, deleteGamer, arg.UserID, arg.ChallengeID)
+	return err
+}
+
+const getLongestActivityPerDay = `-- name: GetLongestActivityPerDay :many
+WITH max_distance_activities AS (
+    SELECT
+        a.user_id,
+        strftime('%Y-%m-%d', datetime(a.start_date_local, 'unixepoch')) AS date,
+        MAX(a.distance) AS max_distance
+    FROM raw_activities AS a
+             INNER JOIN gamers AS g ON a.user_id = g.user_id AND g.challenge_id = ?
+    WHERE a.start_date_local BETWEEN g.start_date AND g.end_date
+    GROUP BY a.user_id, date
+)
+SELECT a.id, a.user_id, a.create_at, a.start_date, a.start_date_local, a.distance, a.average_speed, a.moving_time, a.name, a.sport_type, a.max_speed, a.original_data
+FROM raw_activities AS a
+ INNER JOIN max_distance_activities AS mda ON a.user_id = mda.user_id AND a.distance = mda.max_distance
+`
+
+func (q *Queries) GetLongestActivityPerDay(ctx context.Context, challengeID int64) ([]RawActivity, error) {
+	rows, err := q.db.QueryContext(ctx, getLongestActivityPerDay, challengeID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Gamer{}
+	items := []RawActivity{}
 	for rows.Next() {
-		var i Gamer
+		var i RawActivity
 		if err := rows.Scan(
+			&i.ID,
 			&i.UserID,
+			&i.CreateAt,
+			&i.StartDate,
+			&i.StartDateLocal,
+			&i.Distance,
+			&i.AverageSpeed,
+			&i.MovingTime,
+			&i.Name,
+			&i.SportType,
+			&i.MaxSpeed,
+			&i.OriginalData,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listGamers = `-- name: ListGamers :many
+SELECT
+    challenge_id, user_id, user_name, start_date, end_date, target
+FROM gamers AS l
+JOIN register_users AS r ON l.user_id = r.id AND active = 1
+WHERE challenge_id = ?
+`
+
+type ListGamersRow struct {
+	ChallengeID int64  `json:"challenge_id"`
+	UserID      int64  `json:"user_id"`
+	UserName    string `json:"user_name"`
+	StartDate   int64  `json:"start_date"`
+	EndDate     int64  `json:"end_date"`
+	Target      int64  `json:"target"`
+}
+
+func (q *Queries) ListGamers(ctx context.Context, challengeID int64) ([]ListGamersRow, error) {
+	rows, err := q.db.QueryContext(ctx, listGamers, challengeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListGamersRow{}
+	for rows.Next() {
+		var i ListGamersRow
+		if err := rows.Scan(
+			&i.ChallengeID,
+			&i.UserID,
+			&i.UserName,
 			&i.StartDate,
 			&i.EndDate,
 			&i.Target,
@@ -106,88 +155,4 @@ func (q *Queries) ListGamers(ctx context.Context) ([]Gamer, error) {
 		return nil, err
 	}
 	return items, nil
-}
-
-const listLongestRunPerDay = `-- name: ListLongestRunPerDay :many
-SELECT
-    l.user_id, today, activity_id, l.start_date, distance, average_speed, moving_time, name, sport_type, max_speed
-FROM longest_run_per_day as l
-INNER JOIN gamers AS r on l.user_id = r.user_id
-`
-
-func (q *Queries) ListLongestRunPerDay(ctx context.Context) ([]LongestRunPerDay, error) {
-	rows, err := q.db.QueryContext(ctx, listLongestRunPerDay)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []LongestRunPerDay{}
-	for rows.Next() {
-		var i LongestRunPerDay
-		if err := rows.Scan(
-			&i.UserID,
-			&i.Today,
-			&i.ActivityID,
-			&i.StartDate,
-			&i.Distance,
-			&i.AverageSpeed,
-			&i.MovingTime,
-			&i.Name,
-			&i.SportType,
-			&i.MaxSpeed,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const updateLongestRunPerDay = `-- name: UpdateLongestRunPerDay :one
-INSERT OR REPLACE into longest_run_per_day (
-    user_id, today, activity_id, start_date, distance, average_speed, moving_time, name, sport_type, max_speed)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-RETURNING user_id, today
-`
-
-type UpdateLongestRunPerDayParams struct {
-	UserID       int64          `json:"user_id"`
-	Today        int64          `json:"today"`
-	ActivityID   int64          `json:"activity_id"`
-	StartDate    int64          `json:"start_date"`
-	Distance     float64        `json:"distance"`
-	AverageSpeed float64        `json:"average_speed"`
-	MovingTime   int64          `json:"moving_time"`
-	Name         sql.NullString `json:"name"`
-	SportType    string         `json:"sport_type"`
-	MaxSpeed     float64        `json:"max_speed"`
-}
-
-type UpdateLongestRunPerDayRow struct {
-	UserID int64 `json:"user_id"`
-	Today  int64 `json:"today"`
-}
-
-func (q *Queries) UpdateLongestRunPerDay(ctx context.Context, arg UpdateLongestRunPerDayParams) (UpdateLongestRunPerDayRow, error) {
-	row := q.db.QueryRowContext(ctx, updateLongestRunPerDay,
-		arg.UserID,
-		arg.Today,
-		arg.ActivityID,
-		arg.StartDate,
-		arg.Distance,
-		arg.AverageSpeed,
-		arg.MovingTime,
-		arg.Name,
-		arg.SportType,
-		arg.MaxSpeed,
-	)
-	var i UpdateLongestRunPerDayRow
-	err := row.Scan(&i.UserID, &i.Today)
-	return i, err
 }

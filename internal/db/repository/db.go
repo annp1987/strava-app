@@ -91,10 +91,6 @@ func (s *database) CreateActivityTx(ctx context.Context, activity []sqlite.Creat
 				return err
 			}
 		}
-		//_, err := queries.UpdateLongestRunPerDay(ctx, )
-		//if err != nil {
-		//	return err
-		//}
 		return nil
 	})
 	return err

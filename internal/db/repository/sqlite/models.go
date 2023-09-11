@@ -8,38 +8,33 @@ import (
 	"database/sql"
 )
 
-type Gamer struct {
-	UserID    int64 `json:"user_id"`
-	StartDate int64 `json:"start_date"`
-	EndDate   int64 `json:"end_date"`
-	Target    int64 `json:"target"`
+type Challenge struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Rules string `json:"rules"`
 }
 
-type LongestRunPerDay struct {
-	UserID       int64          `json:"user_id"`
-	Today        int64          `json:"today"`
-	ActivityID   int64          `json:"activity_id"`
-	StartDate    int64          `json:"start_date"`
-	Distance     float64        `json:"distance"`
-	AverageSpeed float64        `json:"average_speed"`
-	MovingTime   int64          `json:"moving_time"`
-	Name         sql.NullString `json:"name"`
-	SportType    string         `json:"sport_type"`
-	MaxSpeed     float64        `json:"max_speed"`
+type Gamer struct {
+	ChallengeID int64 `json:"challenge_id"`
+	UserID      int64 `json:"user_id"`
+	StartDate   int64 `json:"start_date"`
+	EndDate     int64 `json:"end_date"`
+	Target      int64 `json:"target"`
 }
 
 type RawActivity struct {
-	ID           int64          `json:"id"`
-	UserID       int64          `json:"user_id"`
-	CreateAt     int64          `json:"create_at"`
-	StartDate    int64          `json:"start_date"`
-	Distance     float64        `json:"distance"`
-	AverageSpeed float64        `json:"average_speed"`
-	MovingTime   int64          `json:"moving_time"`
-	Name         sql.NullString `json:"name"`
-	SportType    string         `json:"sport_type"`
-	MaxSpeed     float64        `json:"max_speed"`
-	OriginalData sql.NullString `json:"original_data"`
+	ID             int64          `json:"id"`
+	UserID         int64          `json:"user_id"`
+	CreateAt       int64          `json:"create_at"`
+	StartDate      int64          `json:"start_date"`
+	StartDateLocal int64          `json:"start_date_local"`
+	Distance       float64        `json:"distance"`
+	AverageSpeed   float64        `json:"average_speed"`
+	MovingTime     int64          `json:"moving_time"`
+	Name           sql.NullString `json:"name"`
+	SportType      string         `json:"sport_type"`
+	MaxSpeed       float64        `json:"max_speed"`
+	OriginalData   sql.NullString `json:"original_data"`
 }
 
 type RegisterUser struct {

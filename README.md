@@ -1,10 +1,45 @@
-AuthURL
-=======
-http://www.strava.com/oauth/authorize?client_id=113411&response_type=code&redirect_uri=http://localhost:8080/connect&approval_prompt=force&scope=read_all,profile:read_all,activity:read_all
+Authentication Link
+===================
 
-API sample:
-1. Join Game
-curl -X PUT -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/game/join -d '{"start_date": 1694348963, "end_date": 1695212963, "target": 15000}'
-2. Unjoin Game 
-curl -X DELETE -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/game/unjoin
-3. GetActivity
+http://www.strava.com/oauth/authorize?client_id=113411&response_type=code&redirect_uri=http://api.parkrun.online/connect&approval_prompt=force&scope=read_all,profile:read_all,activity:read_all
+
+API Endpoint
+============
+
+1. Challenges
+
+- Create Challenge: POST /v1/challenges
+- Update Challenge: PUT /v1/challenges/{id}
+- Get Challenge: GET /v1/challenges/{id}
+- List Challenge: GET /v1/challenges
+- Join Challenge: PUT /v1/challenges/{id}/join
+- UnJoin Challenge: DELETE /v1/challenges/{id}/unjoin
+- List Gamer per challenge: GET /v1/challenges/{id}/gamers
+- List Longest run per day: GET /v1/challenges/{id}/longest-run-per-day
+
+2. Activity
+
+- Get Activity: GET /v1/activity/{id}
+
+API Sample
+==========
+
+- Create Challenge
+
+   ```curl -X POST -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/challenges -d '{"name": "park run", "rules": "haha"}'```
+
+- Join Game
+
+   ```curl -X PUT -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/join -d '{"start_date": 1692476825, "end_date": 1695155225, "target": 30}'```
+
+- Unjoin Game
+
+   ```curl -X DELETE -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/unjoin```
+
+- GetActivity
+
+   ```curl -X GET -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/activity/112078641```
+
+- LongestRunPerDay
+
+   ```curl -X GET -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/longest-run-per-day```

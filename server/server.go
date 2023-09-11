@@ -54,9 +54,17 @@ func (s *WebServer) Start() error {
 		c.Locals("user_id", id)
 		return c.Next()
 	})
-	v1.Get("/user/:id", s.route.GetActivity)
-	v1.Put("/game/join", s.route.JoinGame)
-	v1.Delete("/game/unjoin", s.route.UnJoinGame)
+	v1.Get("/activity/:id", s.route.GetActivity)
+
+	// game
+	v1.Post("/challenges", s.route.CreateChallenge)
+	v1.Put("/challenges/:id", s.route.UpdateChallenge)
+	v1.Get("/challenges/:id", s.route.GetChallenge)
+	v1.Get("challenges", s.route.ListChallenge)
+	v1.Get("/challenges/:id/gamers", s.route.ListGamerPerChallenge)
+	v1.Get("/challenges/:id/longest-run-per-day", s.route.ListLongestRunPerActivity)
+	v1.Put("/challenges/:id/join", s.route.JoinGame)
+	v1.Delete("/challenges/:id/unjoin", s.route.UnJoinGame)
 
 	return app.Listen(fmt.Sprintf(":%s", s.conf.ServicePort))
 }
