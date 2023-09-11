@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strava-app/internal/db/repository/sqlite"
+	"strava-app/internal/token"
 	"time"
 )
 
@@ -86,11 +87,17 @@ func (s handler) Connect(c *fiber.Ctx) error {
 		RefreshToken:  oathResp.RefreshToken,
 		ExpiredAt:     oathResp.ExpiresAt,
 	}
-	if _, err := s.db.CreateUser(context.Background(), params); err != nil {
+
+	// Generate encoded token and send it as response.
+	t, err := token.GenerateToken(int64(oathResp.Athlete.ID))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	fmt.Println("token: ", t)
+	if _, err = s.db.CreateUser(context.Background(), params); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "create user %s", err.Error())
 	}
-
-	redirectUrl := fmt.Sprintf("%s?id=%d&user_name=%s&profile=%s&profile_medium=%s", s.conf.RedirectURL,
-		oathResp.Athlete.ID, oathResp.Athlete.Username, oathResp.Athlete.Profile, oathResp.Athlete.ProfileMedium)
+	redirectUrl := fmt.Sprintf("%s?id=%d&user_name=%s&profile=%s&profile_medium=%s&token=%s", s.conf.RedirectURL,
+		oathResp.Athlete.ID, oathResp.Athlete.Username, oathResp.Athlete.Profile, oathResp.Athlete.ProfileMedium, t)
 	return c.Redirect(redirectUrl, 301)
 }

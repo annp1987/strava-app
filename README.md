@@ -26,20 +26,20 @@ API Sample
 
 - Create Challenge
 
-   ```curl -X POST -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/challenges -d '{"name": "park run", "rules": "haha"}'```
+   ```curl -X POST -H "Authorization: Bearer v2.local.caHTS-lKZRmqQ-s1-bkgQytELrMXGoyG3jbT077bXXo6DvDfRW8snm8ogpex6_qXZ98QQ0FRLvcq8LAPivAjlATSDG8LKdFp1-aa23bitUtqTA.bnVsbA" -H "Content-Type: application/json" http://localhost:8080/v1/challenges -d '{"name": "park run2", "rules": "haha"}'```
 
 - Join Game
 
-   ```curl -X PUT -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/join -d '{"start_date": 1692476825, "end_date": 1695155225, "target": 30}'```
+   ```curl -X PUT -H "Authorization: Bearer v2.local.caHTS-lKZRmqQ-s1-bkgQytELrMXGoyG3jbT077bXXo6DvDfRW8snm8ogpex6_qXZ98QQ0FRLvcq8LAPivAjlATSDG8LKdFp1-aa23bitUtqTA.bnVsbA" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/join -d '{"start_date": 1692476825, "end_date": 1695155225, "target": 30}'```
 
 - Unjoin Game
 
-   ```curl -X DELETE -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/unjoin```
+   ```curl -X DELETE -H "Authorization: Bearer v2.local.caHTS-lKZRmqQ-s1-bkgQytELrMXGoyG3jbT077bXXo6DvDfRW8snm8ogpex6_qXZ98QQ0FRLvcq8LAPivAjlATSDG8LKdFp1-aa23bitUtqTA.bnVsbA" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/unjoin```
 
 - GetActivity
 
-   ```curl -X GET -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/activity/112078641```
+   ```curl -X GET -H "Authorization: Bearer v2.local.caHTS-lKZRmqQ-s1-bkgQytELrMXGoyG3jbT077bXXo6DvDfRW8snm8ogpex6_qXZ98QQ0FRLvcq8LAPivAjlATSDG8LKdFp1-aa23bitUtqTA.bnVsbA" -H "Content-Type: application/json" http://localhost:8080/v1/activity/112078641```
 
 - LongestRunPerDay
 
-   ```curl -X GET -H "x-user-info: 112078641" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/longest-run-per-day```
+   ```curl -X GET -H "Authorization: Bearer v2.local.caHTS-lKZRmqQ-s1-bkgQytELrMXGoyG3jbT077bXXo6DvDfRW8snm8ogpex6_qXZ98QQ0FRLvcq8LAPivAjlATSDG8LKdFp1-aa23bitUtqTA.bnVsbA" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/longest-run-per-day```

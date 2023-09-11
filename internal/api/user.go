@@ -7,9 +7,9 @@ import (
 )
 
 func (s handler) GetActivity(c *fiber.Ctx) error {
-	id, _ := strconv.Atoi(c.Params("id"))
+	userID, _ := strconv.Atoi(c.Params("id"))
 	params := sqlite.GetActivityParams{
-		UserID:    int64(id),
+		UserID:    int64(userID),
 		SportType: "Run",
 	}
 	activities, err := s.db.GetActivity(c.Context(), params)

@@ -1,15 +1,15 @@
 package server
 
 import (
-	"database/sql"
-	"errors"
+	"encoding/json"
 	"fmt"
-	fiber "github.com/gofiber/fiber/v2"
+	pasetoware "github.com/gofiber/contrib/paseto"
+	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 	"strava-app/internal/api"
 	"strava-app/internal/config"
 	"strava-app/internal/db/repository"
-	"strconv"
+	"strava-app/internal/token"
 )
 
 type WebServer struct {
@@ -36,24 +36,16 @@ func (s *WebServer) Start() error {
 
 	v1 := app.Group("/v1")
 	// authentication middleware
-	v1.Use(func(c *fiber.Ctx) error {
-		header := c.GetReqHeaders()
-		userInfo, ok := header["X-User-Info"]
-		if !ok {
-			return c.Status(fiber.StatusBadRequest).JSON("missing user id in x-user-info request header")
-		}
-		id, _ := strconv.Atoi(userInfo)
-		_, err := s.db.IsActiveUser(c.Context(), int64(id))
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return c.Status(fiber.StatusUnauthorized).JSON("please sign up first")
-			}
-			msg := fmt.Sprintf("IsActiveUser failed: %s", err.Error())
-			return c.Status(fiber.StatusInternalServerError).JSON(msg)
-		}
-		c.Locals("user_id", id)
-		return c.Next()
-	})
+	v1.Use(pasetoware.New(pasetoware.Config{
+		SymmetricKey: []byte(token.SecretSymmetricKey),
+		TokenPrefix:  "Bearer",
+		Validate: func(decrypted []byte) (interface{}, error) {
+			var payload token.Claims
+			err := json.Unmarshal(decrypted, &payload)
+			return payload, err
+		},
+	}))
+
 	v1.Get("/activity/:id", s.route.GetActivity)
 
 	// game

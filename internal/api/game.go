@@ -3,8 +3,10 @@ package api
 import (
 	"database/sql"
 	"errors"
+	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"strava-app/internal/db/repository/sqlite"
+	"strava-app/internal/token"
 	"strconv"
 )
 
@@ -74,9 +76,9 @@ func (s handler) JoinGame(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
-	id := c.Locals("user_id").(int)
+	payload := c.Locals(pasetoware.DefaultContextKey).(token.Claims)
 	challengeID, _ := strconv.Atoi(c.Params("id"))
-	params.UserID = int64(id)
+	params.UserID = payload.UserID
 	params.ChallengeID = int64(challengeID)
 	game, err := s.db.CreateGamer(c.Context(), params)
 	if err != nil {
@@ -86,10 +88,10 @@ func (s handler) JoinGame(c *fiber.Ctx) error {
 }
 
 func (s handler) UnJoinGame(c *fiber.Ctx) error {
-	id := c.Locals("user_id").(int)
+	payload := c.Locals(pasetoware.DefaultContextKey).(token.Claims)
 	challengeID, _ := strconv.Atoi(c.Params("id"))
 	err := s.db.DeleteGamer(c.Context(), sqlite.DeleteGamerParams{
-		UserID:      int64(id),
+		UserID:      payload.UserID,
 		ChallengeID: int64(challengeID),
 	})
 	if err != nil {
@@ -99,8 +101,8 @@ func (s handler) UnJoinGame(c *fiber.Ctx) error {
 }
 
 func (s handler) ListLongestRunPerActivity(c *fiber.Ctx) error {
-	challengeID, _ := strconv.Atoi(c.Params("id"))
-	game, err := s.db.GetLongestActivityPerDay(c.Context(), int64(challengeID))
+	payload := c.Locals(pasetoware.DefaultContextKey).(token.Claims)
+	game, err := s.db.GetLongestActivityPerDay(c.Context(), payload.UserID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
 	}
