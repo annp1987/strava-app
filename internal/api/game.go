@@ -10,7 +10,18 @@ import (
 	"strconv"
 )
 
+var adminGroup = map[int64]bool{
+	121743168: true,
+	113840436: true,
+	112078641: true,
+}
+
 func (s handler) CreateChallenge(c *fiber.Ctx) error {
+	payload := c.Locals(pasetoware.DefaultContextKey).(token.Claims)
+	_, ok := adminGroup[payload.UserID]
+	if !ok {
+		return c.Status(fiber.StatusForbidden).JSON("permission denied")
+	}
 	var params sqlite.CreateChallengeParams
 	err := c.BodyParser(&params)
 	if err != nil {
@@ -24,6 +35,11 @@ func (s handler) CreateChallenge(c *fiber.Ctx) error {
 }
 
 func (s handler) UpdateChallenge(c *fiber.Ctx) error {
+	payload := c.Locals(pasetoware.DefaultContextKey).(token.Claims)
+	_, ok := adminGroup[payload.UserID]
+	if !ok {
+		return c.Status(fiber.StatusForbidden).JSON("permission denied")
+	}
 	challengeID, _ := strconv.Atoi(c.Params("id"))
 	var params sqlite.UpdateChallengeParams
 	err := c.BodyParser(&params)

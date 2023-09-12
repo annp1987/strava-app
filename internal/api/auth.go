@@ -86,11 +86,12 @@ func (s handler) Connect(c *fiber.Ctx) error {
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
-	fmt.Println("token: ", t)
+	//fmt.Println("token: ", t)
 	if _, err = s.db.CreateUser(context.Background(), params); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "create user %s", err.Error())
 	}
+	userName := fmt.Sprintf("%s %s", oathResp.Athlete.FirstName, oathResp.Athlete.LastName)
 	redirectUrl := fmt.Sprintf("%s?id=%d&user_name=%s&profile=%s&profile_medium=%s&token=%s", s.conf.RedirectURL,
-		oathResp.Athlete.ID, oathResp.Athlete.Username, oathResp.Athlete.Profile, oathResp.Athlete.ProfileMedium, t)
+		oathResp.Athlete.ID, userName, oathResp.Athlete.Profile, oathResp.Athlete.ProfileMedium, t)
 	return c.Redirect(redirectUrl, 301)
 }
