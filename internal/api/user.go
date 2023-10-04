@@ -18,3 +18,12 @@ func (s handler) GetActivity(c *fiber.Ctx) error {
 	}
 	return c.JSON(activities)
 }
+
+func (s handler) GetUserInfo(c *fiber.Ctx) error {
+	userID, _ := strconv.Atoi(c.Params("id"))
+	user, err := s.db.GetActiveUser(c.Context(), int64(userID))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+	}
+	return c.JSON(user)
+}

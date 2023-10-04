@@ -46,13 +46,16 @@ func (s *WebServer) Start() error {
 		},
 	}))
 
+	// activity
 	v1.Get("/activity/:id", s.route.GetActivity)
 
+	// user info
+	v1.Get("/users/:id", s.route.GetUserInfo)
 	// game
 	v1.Post("/challenges", s.route.CreateChallenge)
 	v1.Put("/challenges/:id", s.route.UpdateChallenge)
 	v1.Get("/challenges/:id", s.route.GetChallenge)
-	v1.Get("challenges", s.route.ListChallenge)
+	v1.Get("/challenges", s.route.ListChallenge)
 	v1.Get("/challenges/:id/gamers", s.route.ListGamerPerChallenge)
 	v1.Get("/challenges/:id/longest-run-per-day", s.route.ListLongestRunPerActivity)
 	v1.Put("/challenges/:id/join", s.route.JoinGame)

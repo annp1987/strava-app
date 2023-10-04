@@ -29,3 +29,8 @@ WHERE id = ? AND active = 1;
 SELECT id
 FROM register_users
 WHERE active = 1;
+
+-- name: GetActiveUser :one
+SELECT id, user_name, first_name, last_name, profile_medium, profile
+FROM register_users
+WHERE id = ? AND active = 1;
