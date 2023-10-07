@@ -18,6 +18,7 @@ type Querier interface {
 	GetActiveUser(ctx context.Context, id int64) (GetActiveUserRow, error)
 	GetActivity(ctx context.Context, arg GetActivityParams) ([]GetActivityRow, error)
 	GetChallenge(ctx context.Context, id int64) (Challenge, error)
+	GetJoinedChallenges(ctx context.Context, userID int64) ([]GetJoinedChallengesRow, error)
 	GetLongestActivityPerDay(ctx context.Context, challengeID int64) ([]RawActivity, error)
 	GetToken(ctx context.Context, id int64) (GetTokenRow, error)
 	IsActiveUser(ctx context.Context, id int64) (int64, error)

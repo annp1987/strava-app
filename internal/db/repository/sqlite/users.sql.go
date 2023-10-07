@@ -94,6 +94,41 @@ func (q *Queries) GetActiveUser(ctx context.Context, id int64) (GetActiveUserRow
 	return i, err
 }
 
+const getJoinedChallenges = `-- name: GetJoinedChallenges :many
+SELECT c.id, c.name
+FROM gamers AS g
+ JOIN challenges AS c ON g.challenge_id = c.id
+WHERE g.user_id = ?
+`
+
+type GetJoinedChallengesRow struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) GetJoinedChallenges(ctx context.Context, userID int64) ([]GetJoinedChallengesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getJoinedChallenges, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetJoinedChallengesRow{}
+	for rows.Next() {
+		var i GetJoinedChallengesRow
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getToken = `-- name: GetToken :one
 SELECT access_token, refresh_token, expired_at FROM register_users
 WHERE id = ? LIMIT 1

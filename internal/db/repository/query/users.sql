@@ -34,3 +34,9 @@ WHERE active = 1;
 SELECT id, user_name, first_name, last_name, profile_medium, profile
 FROM register_users
 WHERE id = ? AND active = 1;
+
+-- name: GetJoinedChallenges :many
+SELECT c.id, c.name
+FROM gamers AS g
+ JOIN challenges AS c ON g.challenge_id = c.id
+WHERE g.user_id = ?;
