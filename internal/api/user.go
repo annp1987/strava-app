@@ -1,8 +1,10 @@
 package api
 
 import (
+	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"strava-app/internal/db/repository/sqlite"
+	"strava-app/internal/token"
 	"strconv"
 )
 
@@ -17,6 +19,15 @@ func (s handler) GetActivity(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
 	}
 	return c.JSON(activities)
+}
+
+func (s handler) GetMe(c *fiber.Ctx) error {
+	payload := c.Locals(pasetoware.DefaultContextKey).(token.Claims)
+	user, err := s.db.GetActiveUser(c.Context(), payload.UserID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+	}
+	return c.JSON(user)
 }
 
 func (s handler) GetUserInfo(c *fiber.Ctx) error {

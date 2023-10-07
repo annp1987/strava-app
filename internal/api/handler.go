@@ -17,6 +17,7 @@ type ServerAPI interface {
 	Connect(c *fiber.Ctx) error
 	GetActivity(c *fiber.Ctx) error
 	GetUserInfo(c *fiber.Ctx) error
+	GetMe(c *fiber.Ctx) error
 	CreateChallenge(c *fiber.Ctx) error
 	UpdateChallenge(c *fiber.Ctx) error
 	GetChallenge(c *fiber.Ctx) error

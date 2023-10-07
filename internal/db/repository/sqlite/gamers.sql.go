@@ -112,19 +112,21 @@ func (q *Queries) GetLongestActivityPerDay(ctx context.Context, challengeID int6
 
 const listGamers = `-- name: ListGamers :many
 SELECT
-    challenge_id, user_id, user_name, start_date, end_date, target
+    challenge_id, user_id, name as challenge_name, user_name, start_date, end_date, target
 FROM gamers AS l
 JOIN register_users AS r ON l.user_id = r.id AND active = 1
+JOIN challenges AS c ON l.challenge_id = c.id
 WHERE challenge_id = ?
 `
 
 type ListGamersRow struct {
-	ChallengeID int64  `json:"challenge_id"`
-	UserID      int64  `json:"user_id"`
-	UserName    string `json:"user_name"`
-	StartDate   int64  `json:"start_date"`
-	EndDate     int64  `json:"end_date"`
-	Target      int64  `json:"target"`
+	ChallengeID   int64  `json:"challenge_id"`
+	UserID        int64  `json:"user_id"`
+	ChallengeName string `json:"challenge_name"`
+	UserName      string `json:"user_name"`
+	StartDate     int64  `json:"start_date"`
+	EndDate       int64  `json:"end_date"`
+	Target        int64  `json:"target"`
 }
 
 func (q *Queries) ListGamers(ctx context.Context, challengeID int64) ([]ListGamersRow, error) {
@@ -139,6 +141,7 @@ func (q *Queries) ListGamers(ctx context.Context, challengeID int64) ([]ListGame
 		if err := rows.Scan(
 			&i.ChallengeID,
 			&i.UserID,
+			&i.ChallengeName,
 			&i.UserName,
 			&i.StartDate,
 			&i.EndDate,

@@ -10,9 +10,10 @@ WHERE user_id = ? and challenge_id  = ?;
 
 -- name: ListGamers :many
 SELECT
-    challenge_id, user_id, user_name, start_date, end_date, target
+    challenge_id, user_id, name as challenge_name, user_name, start_date, end_date, target
 FROM gamers AS l
 JOIN register_users AS r ON l.user_id = r.id AND active = 1
+JOIN challenges AS c ON l.challenge_id = c.id
 WHERE challenge_id = ?;
 
 -- name: GetLongestActivityPerDay :many

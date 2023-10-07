@@ -23,6 +23,7 @@ API Endpoint
 
 3. User
 - Get User info: GET /v1/users/{id}
+- Get caller info: GET /v1/me
 
 API Sample
 ==========
@@ -47,4 +48,4 @@ API Sample
 
    ```curl -X GET -H "Authorization: Bearer v2.local.caHTS-lKZRmqQ-s1-bkgQytELrMXGoyG3jbT077bXXo6DvDfRW8snm8ogpex6_qXZ98QQ0FRLvcq8LAPivAjlATSDG8LKdFp1-aa23bitUtqTA.bnVsbA" -H "Content-Type: application/json" http://localhost:8080/v1/challenges/1/longest-run-per-day```
 - Get User Info
-  ```curl -X GET -H "Authorization: Bearer v2.local.KZLzXcgGIF-XqXtDW3h7qTDPg9HalHpIbuUTee-qAEU3FqQGsehA2qwoi_TJ97Vj3p07K9ZIdTc3MFUFnVS381LH1w1x3uddw-DezIdG4kKGaQ.bnVsbA" http://localhost:8080/v1/users/112078641```
+  ```curl -X GET -H "Authorization: Bearer v2.local.OHj7dEk0R_kWm_qO9XlhUqx5b6zQdsYtK4b3BIlDV6Xk2BXch7QcUzRPEd2AxAjmOVYFUakdJLVP8DfyDQW8VaHvgxZe_gOOQNJTZRawcqajgw.bnVsbA" http://localhost:8080/v1/users/112078641```

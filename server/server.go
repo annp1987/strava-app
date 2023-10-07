@@ -5,6 +5,7 @@ import (
 	"fmt"
 	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"go.uber.org/zap"
 	"strava-app/internal/api"
 	"strava-app/internal/config"
@@ -35,6 +36,12 @@ func (s *WebServer) Start() error {
 	app.Get("/connect", s.route.Connect)
 
 	v1 := app.Group("/v1")
+	v1.Use(cors.New(cors.Config{
+		AllowOrigins:     "*",
+		AllowMethods:     "POST, GET, OPTIONS, PUT, DELETE, PATCH",
+		AllowHeaders:     "Accept, Content-Type, Authorization, Connection, Upgrade",
+		AllowCredentials: true,
+	}))
 	// authentication middleware
 	v1.Use(pasetoware.New(pasetoware.Config{
 		SymmetricKey: []byte(token.SecretSymmetricKey),
@@ -49,6 +56,7 @@ func (s *WebServer) Start() error {
 	// activity
 	v1.Get("/activity/:id", s.route.GetActivity)
 
+	v1.Get("/me", s.route.GetMe)
 	// user info
 	v1.Get("/users/:id", s.route.GetUserInfo)
 	// game

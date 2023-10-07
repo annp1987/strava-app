@@ -5,11 +5,10 @@ go 1.17
 require go.uber.org/fx v1.16.0
 
 require (
-	github.com/gofiber/contrib/jwt v1.0.6
 	github.com/gofiber/contrib/paseto v1.0.9
 	github.com/gofiber/fiber/v2 v2.49.1
-	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/mattn/go-sqlite3 v1.14.17
+	github.com/o1egl/paseto v1.0.0
 	github.com/obalunenko/strava-api v0.0.0-20230905101930-f08f736b0666
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/spf13/viper v1.16.0
@@ -17,7 +16,6 @@ require (
 )
 
 require (
-	github.com/MicahParks/keyfunc/v2 v2.1.0 // indirect
 	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
 	github.com/aead/chacha20poly1305 v0.0.0-20170617001512-233f39982aeb // indirect
 	github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635 // indirect
@@ -46,7 +44,6 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/o1egl/paseto v1.0.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
