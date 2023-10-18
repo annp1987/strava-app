@@ -5,6 +5,7 @@ import (
 	"errors"
 	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 	"strava-app/internal/db/repository/sqlite"
 	"strava-app/internal/token"
 	"strconv"
@@ -119,6 +120,31 @@ func (s handler) UnJoinGame(c *fiber.Ctx) error {
 func (s handler) ListLongestRunPerActivity(c *fiber.Ctx) error {
 	payload := c.Locals(pasetoware.DefaultContextKey).(token.Claims)
 	game, err := s.db.GetLongestActivityPerDay(c.Context(), payload.UserID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+	}
+	return c.JSON(game)
+}
+
+type LongestRunPerDayQueryParams struct {
+	Date string `json:"date"`
+}
+
+func (s handler) ListLongestRunPerActivity2(c *fiber.Ctx) error {
+
+	var queryParams LongestRunPerDayQueryParams
+	err := c.QueryParser(&queryParams)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
+	}
+	s.logger.Info("query params", zap.Reflect("params", queryParams))
+	begin, end := GetDateTime(queryParams.Date)
+	params := sqlite.GetLongestActivityPerDay2Params{
+		Begin: begin,
+		End:   end,
+	}
+	s.logger.Info("query with", zap.Int64("begin", begin), zap.Int64("end", end))
+	game, err := s.db.GetLongestActivityPerDay2(c.Context(), params)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
 	}

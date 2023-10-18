@@ -1,16 +1,13 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
-	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"go.uber.org/zap"
 	"strava-app/internal/api"
 	"strava-app/internal/config"
 	"strava-app/internal/db/repository"
-	"strava-app/internal/token"
 )
 
 type WebServer struct {
@@ -43,15 +40,15 @@ func (s *WebServer) Start() error {
 		AllowCredentials: true,
 	}))
 	// authentication middleware
-	v1.Use(pasetoware.New(pasetoware.Config{
-		SymmetricKey: []byte(token.SecretSymmetricKey),
-		TokenPrefix:  "Bearer",
-		Validate: func(decrypted []byte) (interface{}, error) {
-			var payload token.Claims
-			err := json.Unmarshal(decrypted, &payload)
-			return payload, err
-		},
-	}))
+	//v1.Use(pasetoware.New(pasetoware.Config{
+	//	SymmetricKey: []byte(token.SecretSymmetricKey),
+	//	TokenPrefix:  "Bearer",
+	//	Validate: func(decrypted []byte) (interface{}, error) {
+	//		var payload token.Claims
+	//		err := json.Unmarshal(decrypted, &payload)
+	//		return payload, err
+	//	},
+	//}))
 
 	// activity
 	v1.Get("/activity/:id", s.route.GetActivity)
@@ -68,6 +65,7 @@ func (s *WebServer) Start() error {
 	v1.Get("/challenges/:id/longest-run-per-day", s.route.ListLongestRunPerActivity)
 	v1.Put("/challenges/:id/join", s.route.JoinGame)
 	v1.Delete("/challenges/:id/unjoin", s.route.UnJoinGame)
+	v1.Get("/activities/longest-run-per-day", s.route.ListLongestRunPerActivity2)
 
 	return app.Listen(fmt.Sprintf(":%s", s.conf.ServicePort))
 }

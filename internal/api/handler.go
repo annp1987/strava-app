@@ -24,6 +24,7 @@ type ServerAPI interface {
 	ListChallenge(c *fiber.Ctx) error
 	ListGamerPerChallenge(c *fiber.Ctx) error
 	ListLongestRunPerActivity(c *fiber.Ctx) error
+	ListLongestRunPerActivity2(c *fiber.Ctx) error
 	JoinGame(c *fiber.Ctx) error
 	UnJoinGame(c *fiber.Ctx) error
 }

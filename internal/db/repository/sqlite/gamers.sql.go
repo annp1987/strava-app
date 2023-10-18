@@ -110,6 +110,97 @@ func (q *Queries) GetLongestActivityPerDay(ctx context.Context, challengeID int6
 	return items, nil
 }
 
+const getLongestActivityPerDay2 = `-- name: GetLongestActivityPerDay2 :many
+WITH max_distance_activities AS (
+SELECT
+    a.user_id,
+    strftime('%Y-%m-%d', datetime(a.start_date_local, 'unixepoch')) AS date,
+    MAX(a.distance) AS max_distance
+FROM raw_activities AS a
+    INNER JOIN register_users AS g ON a.user_id = g.id
+WHERE a.start_date_local >= ?1 AND a.start_date_local <= ?2 AND a.sport_type='Run'
+GROUP BY a.user_id, date
+)
+SELECT mda.date,
+       a.id as activity_id,
+       a.start_date_local,
+       a.distance,
+       a.average_speed,
+       CAST((1000 / a.average_speed) / 60 AS float) AS pace,
+       a.moving_time,
+       a.name as activity_title,
+       a.max_speed,
+       g.first_name,
+       g.last_name,
+       g.user_name,
+       g.profile,
+       g.profile_medium
+FROM raw_activities AS a
+ INNER JOIN max_distance_activities AS mda ON a.user_id = mda.user_id AND a.distance = mda.max_distance
+ INNER JOIN register_users AS g ON a.user_id = g.id
+ORDER BY mda.date
+`
+
+type GetLongestActivityPerDay2Params struct {
+	Begin int64 `json:"begin"`
+	End   int64 `json:"end"`
+}
+
+type GetLongestActivityPerDay2Row struct {
+	Date           interface{} `json:"date"`
+	ActivityID     int64       `json:"activity_id"`
+	StartDateLocal int64       `json:"start_date_local"`
+	Distance       float64     `json:"distance"`
+	AverageSpeed   float64     `json:"average_speed"`
+	Pace           float64     `json:"pace"`
+	MovingTime     int64       `json:"moving_time"`
+	ActivityTitle  string      `json:"activity_title"`
+	MaxSpeed       float64     `json:"max_speed"`
+	FirstName      string      `json:"first_name"`
+	LastName       string      `json:"last_name"`
+	UserName       string      `json:"user_name"`
+	Profile        string      `json:"profile"`
+	ProfileMedium  string      `json:"profile_medium"`
+}
+
+func (q *Queries) GetLongestActivityPerDay2(ctx context.Context, arg GetLongestActivityPerDay2Params) ([]GetLongestActivityPerDay2Row, error) {
+	rows, err := q.db.QueryContext(ctx, getLongestActivityPerDay2, arg.Begin, arg.End)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetLongestActivityPerDay2Row{}
+	for rows.Next() {
+		var i GetLongestActivityPerDay2Row
+		if err := rows.Scan(
+			&i.Date,
+			&i.ActivityID,
+			&i.StartDateLocal,
+			&i.Distance,
+			&i.AverageSpeed,
+			&i.Pace,
+			&i.MovingTime,
+			&i.ActivityTitle,
+			&i.MaxSpeed,
+			&i.FirstName,
+			&i.LastName,
+			&i.UserName,
+			&i.Profile,
+			&i.ProfileMedium,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listGamers = `-- name: ListGamers :many
 SELECT
     challenge_id, user_id, name as challenge_name, user_name, start_date, end_date, target
